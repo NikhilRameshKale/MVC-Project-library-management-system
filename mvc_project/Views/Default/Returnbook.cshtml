@@ -1,0 +1,172 @@
+﻿@{
+    ViewBag.Title = "Return Book";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<!-- 💡 Improved Return Book Form Design -->
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #eaf0f6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 35px 40px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+        color: #555;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+        width: 475px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+        margin-bottom: 20px;
+        transition: border-color 0.3s;
+    }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+    button {
+        width: 100%;
+        background-color: #28a745;
+        color: #fff;
+        padding: 14px;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+    #transaction-details {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-left: 4px solid #007bff;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+        #transaction-details p {
+            margin: 5px 0;
+            font-size: 14.5px;
+        }
+
+    #status-msg {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="form-container">
+    <h2>🔄 Return Book</h2>
+
+    <form id="return-book-form">
+        <label for="transaction-id">Transaction ID</label>
+        <input type="text" id="transaction-id" name="issueId" required />
+
+        <div id="transaction-details">
+            <p><strong>Student ID:</strong> <span id="student-id"></span></p>
+            <p><strong>Book ID:</strong> <span id="book-id"></span></p>
+            <p><strong>Issue Date:</strong> <span id="issue-date"></span></p>
+            <p><strong>Due Date:</strong> <span id="due-date"></span></p>
+            <p><strong>Status:</strong> <span id="status"></span></p>
+        </div>
+
+
+        <label for="actual-return-date">Actual Return Date</label>
+        <input type="date" id="actual-return-date" name="returnDate" required />
+
+        <button type="submit">Return Book</button>
+    </form>
+
+    <div id="status-msg"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('return-book-form');
+        const msgBox = document.getElementById('status-msg');
+        const transactionDetails = document.getElementById('transaction-details');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const issueId = document.getElementById('transaction-id').value.trim();
+            const returnDate = document.getElementById('actual-return-date').value;
+
+            fetch('/Default/ReturnBook', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ issueId: issueId, returnDate: returnDate })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        msgBox.innerHTML = "<span style='color: green;'>Book marked as Returned!</span>";
+                        transactionDetails.style.display = "none";
+                        form.reset();
+                    } else {
+                        msgBox.innerHTML = "<span style='color: red;'>" + data.message + "</span>";
+                    }
+                })
+                .catch(() => {
+                    msgBox.innerHTML = "<span style='color: red;'>Error updating status!</span>";
+                });
+        });
+
+        // Optional: Load transaction details if needed
+        document.getElementById('transaction-id').addEventListener('blur', () => {
+            const issueId = document.getElementById('transaction-id').value.trim();
+            if (issueId !== "") {
+                fetch(`/Default/GetTransactionDetails?issueId=${issueId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('student-id').innerText = data.studentId;
+                            document.getElementById('book-id').innerText = data.bookId;
+                            document.getElementById('issue-date').innerText = data.issueDate;
+                            document.getElementById('due-date').innerText = data.dueDate;
+                            document.getElementById('status').innerText = data.status;
+
+                            transactionDetails.style.display = "block";
+                        } else {
+                            transactionDetails.style.display = "none";
+                        }
+                    });
+            }
+        });
+    });
+</script>

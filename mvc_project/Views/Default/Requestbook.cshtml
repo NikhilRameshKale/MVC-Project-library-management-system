@@ -1,0 +1,187 @@
+﻿@{
+    ViewBag.Title = "Requestbook";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: 50px auto 20px;
+        background: #ffffff;
+        padding: 40px 30px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    input[type="text"],
+    textarea {
+        width: 570px;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 5px;
+        font-size: 14px;
+    }
+
+    input[type="email"],
+    textarea {
+        width: 570px;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 5px;
+        font-size: 14px;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    button {
+        margin-top: 25px;
+        width: 100%;
+        padding: 12px;
+        background-color: #28a745;
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+    .table-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ccc;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        color: #333;
+    }
+
+    .alert-success {
+        margin-top: 20px;
+        color: green;
+    }
+
+    .scroll-table {
+        max-height: 700px; /* किती उंचीपर्यंत scroll होईल ते */
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    }
+
+</style>
+
+<div class="form-container">
+    <h2>📚 Request a Book</h2>
+    <form method="post" action="/Default/RequestBook">
+        <label>Book Title</label>
+        <input type="text" name="BookTitle" placeholder="Enter book title" required>
+
+        <label>Author</label>
+        <input type="text" name="Author" placeholder="Enter author's name" required>
+
+        <label>Publisher</label>
+        <input type="text" name="Publisher" placeholder="Enter publisher name" required>
+
+        <label>Reason for Request</label>
+        <textarea name="Reason" placeholder="Why do you need this book?" required></textarea>
+
+
+        <label>Your Email:</label>
+        <input type="email" name="Email" required placeholder="Enter your email" />
+
+
+        <label>Request Date & Time</label>
+        <input type="text" name="RequestDateTime" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")" readonly />
+
+        <button type="submit">📩 Submit Request</button>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-success">@ViewBag.Message</div>
+        }
+    </form>
+</div>
+
+<!-- 📋 Table Showing Requested Book List -->
+@if (ViewBag.Requests != null)
+{
+    <div class="table-container">
+        <h2 style="text-align:center;">📋 Requested Books</h2>
+
+        <!-- Wrapper div for scroll -->
+        <div class="scroll-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th>Publisher</th>
+                        <th>Reason</th>
+                        <th>Request Date & Time</th>
+                        <th>Request Accept</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in (List<Dictionary<string, string>>)ViewBag.Requests)
+                    {
+                        <tr>
+                            <td>@row["Id"]</td>
+                            <td>@row["BookTitle"]</td>
+                            <td>@row["Author"]</td>
+                            <td>@row["Publisher"]</td>
+                            <td>@row["Reason"]</td>
+                            <td>@row["RequestDateTime"]</td>
+                            <td>@row["RequestAccept"]</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}

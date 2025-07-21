@@ -1,0 +1,179 @@
+﻿@model List<mvc_project.Models.IssuedBook>
+@{
+    ViewBag.Title = "Issued Books";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f4f8;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .search-box {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+        .search-box input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px 0 0 6px;
+            font-size: 14px;
+        }
+
+        .search-box button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+            .search-box button:hover {
+                background-color: #0056b3;
+            }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .no-data-row {
+        text-align: center;
+        color: red;
+        font-style: italic;
+    }
+
+    /* Wrapper div for table scroll */
+    .scrollable-table {
+        max-height: 400px; /* किती उंचीपर्यंत scroll होईल */
+        overflow-y: auto; /* Vertical scrollbar */
+        overflow-x: auto; /* Horizontal scrollbar (optional) */
+        border: 1px solid #ccc;
+        margin-top: 20px;
+    }
+
+        /* Make the table full width */
+        .scrollable-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* Sticky header for better usability */
+        .scrollable-table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f2f2f2;
+            z-index: 1;
+        }
+
+    /* Optional styling */
+    .table th,
+    .table td {
+        padding: 8px 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+
+    .table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+</style>
+
+<div class="container">
+    <h2>📔 Issued Books</h2>
+
+    <!-- Search Form -->
+    <form method="get" action="/Default/IssuedBooks" class="search-box">
+        <input type="text" name="searchTerm" placeholder="Search by Student ID or Book ID" />
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Table Scroll Wrapper -->
+    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; margin-top: 20px;">
+        <table border="1" class="table" style="width: 100%; border-collapse: collapse;">
+            <thead style="position: sticky; top: 0; background-color: #f2f2f2;">
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Student ID</th>
+                    <th>Book ID</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model)
+                {
+                    <tr>
+                        <td>@book.TransactionId</td>
+                        <td>@book.StudentId</td>
+                        <td>@book.BookId</td>
+                        <td>@book.IssueDate.ToString("yyyy-MM-dd")</td>
+                        <td>@book.DueDate.ToString("yyyy-MM-dd")</td>
+                        <td class="status">@book.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function returnBook(issueId) {
+        fetch('/Default/ReturnBook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ issueId: issueId })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Book marked as Returned!');
+                    location.reload(); // reload to update the table status
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(() => alert('Error updating status.'));
+    }
+</script>

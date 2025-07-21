@@ -1,0 +1,140 @@
+﻿@{
+    ViewBag.Title = "CalculateFine";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f7fa;
+    }
+
+    .form-container {
+        max-width: 500px;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 35px 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    label {
+        font-weight: 600;
+        margin-top: 10px;
+        display: block;
+        margin-bottom: 6px;
+        color: #555;
+    }
+
+    input[type="text"], input[type="date"], input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #dc3545;
+        border: none;
+        color: white;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    .fine-result {
+        margin-top: 30px;
+        font-size: 16px;
+        background: #f2f2f2;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .qr-image {
+        display: block;
+        margin: 20px auto;
+        max-width: 250px;
+    }
+</style>
+
+<div class="form-container">
+    <h2>💰 Calculate Fine</h2>
+
+    <form method="post" action="/Default/Calculate">
+        <label for="transactionId">Transaction ID</label>
+        <input type="text" id="transactionId" name="transactionId" required />
+
+        <label for="returnDate">Return Date</label>
+        <input type="date" id="returnDate" name="returnDate" required />
+
+        <button type="submit">Calculate Fine</button>
+    </form>
+
+    @if (ViewBag.FineAmount != null)
+    {
+        <div class="fine-result">
+            <p><strong>Transaction ID:</strong> @ViewBag.TransactionId</p>
+            <p><strong>Issue Date:</strong> @ViewBag.IssueDate</p>
+            <p><strong>Due Date:</strong> @ViewBag.DueDate</p>
+            <p><strong>Return Date:</strong> @ViewBag.ReturnDate</p>
+            <p><strong>Days Overdue:</strong> @ViewBag.DaysOverdue</p>
+            <p><strong>Fine Amount:</strong> ₹@ViewBag.FineAmount</p>
+
+            <h4>📷 QR Code</h4>
+            <img class="qr-image" src="@Url.Action("GenerateFineQRCode", "Default", new {
+                transactionId = ViewBag.TransactionId,
+                issueDate = ViewBag.IssueDate,
+                dueDate = ViewBag.DueDate,
+                returnDate = ViewBag.ReturnDate,
+                daysOverdue = ViewBag.DaysOverdue,
+                fineAmount = ViewBag.FineAmount
+            })" alt="Fine QR Code" />
+
+            <!-- WhatsApp Form -->
+            <form method="post" action="/Default/SendWhatsAppQRCode" style="margin-top:20px;">
+                <label for="mobile">📱 Enter Mobile Number for WhatsApp:</label>
+                <input type="text" id="mobile" name="mobile" required placeholder="e.g. 9876543210" />
+
+                <input type="hidden" name="qrContent" value="📚 Library Fine Receipt Transaction ID: @ViewBag.TransactionId Issue Date: @ViewBag.IssueDate Due Date: @ViewBag.DueDate Return Date: @ViewBag.ReturnDate Days Overdue: @ViewBag.DaysOverdue days Fine Amount: ₹@ViewBag.FineAmount Pay using QR: https://yourdomain.com/QRCodeImages/upi_qr_code.png" />
+
+                <button type="submit">📤 Send on WhatsApp</button>
+            </form>
+
+            <!-- Email Form -->
+            <form method="post" action="/Default/SendEmailWithPDF" style="margin-top:20px;">
+                <label for="email">📧 Enter Email ID to Send PDF:</label>
+                <input type="email" id="email" name="email" required placeholder="e.g. user@gmail.com" />
+
+                <input type="hidden" name="transactionId" value="@ViewBag.TransactionId" />
+                <input type="hidden" name="issueDate" value="@ViewBag.IssueDate" />
+                <input type="hidden" name="dueDate" value="@ViewBag.DueDate" />
+                <input type="hidden" name="returnDate" value="@ViewBag.ReturnDate" />
+                <input type="hidden" name="daysOverdue" value="@ViewBag.DaysOverdue" />
+                <input type="hidden" name="fineAmount" value="@ViewBag.FineAmount" />
+
+                <button type="submit">📧 Send PDF to Email</button>
+            </form>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        window.onload = function () {
+            var message = '@TempData["EmailSuccess"]';
+            if (message) {
+                alert(message);
+            }
+        };
+    </script>
+}

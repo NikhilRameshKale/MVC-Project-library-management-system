@@ -1,0 +1,172 @@
+﻿@{
+    ViewBag.Title = "Search";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+    var results = ViewBag.ResultTable as System.Data.DataTable;
+}
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .search-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 95vh;
+    }
+
+    .search-card {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 700px;
+        margin-bottom:130px;
+    }
+
+    h2 {
+        font-weight: 700;
+        font-size: 24px;
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: block;
+        color: #555;
+    }
+
+    select, input[type="text"] {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+        select:focus, input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        border: none;
+        color: #fff;
+        font-size: 16px;
+        border-radius: 6px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .result-section {
+        margin-top: 30px;
+    }
+
+    .table thead {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+        text-align: center;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .alert {
+        margin-top: 20px;
+    }
+</style>
+
+<div class="search-wrapper">
+    <div class="search-card">
+        <h2>🔍 Search Form – Book / Student</h2>
+
+        <form method="post" action="/Default/Result">
+            <label for="searchType">Select Search Type:</label>
+            <select id="searchType" name="SearchType" onchange="toggleSearchFields()">
+                <option value="">-- Select Option --</option>
+                <option value="book">📚 Book</option>
+                <option value="student">👤 Student</option>
+            </select>
+
+            <div id="bookFields" style="display:none;">
+                <label>Book Name / ISBN:</label>
+                <input type="text" name="BookQuery" placeholder="Enter book name or ISBN" />
+            </div>
+
+            <div id="studentFields" style="display:none;">
+                <label>Student Name / ID:</label>
+                <input type="text" name="StudentQuery" placeholder="Enter student name or ID" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">🔍 Search</button>
+        </form>
+
+        <!-- ✅ Results below in styled section -->
+        @if (results != null && results.Rows.Count > 0)
+        {
+            <div class="result-section">
+                <h5 class="mt-4 mb-3">📋 Search Results:</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                @foreach (System.Data.DataColumn col in results.Columns)
+                                {
+                                    <th>@col.ColumnName</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (System.Data.DataRow row in results.Rows)
+                            {
+                                <tr>
+                                    @foreach (var item in row.ItemArray)
+                                    {
+                                        <td>@item</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else if (results != null)
+        {
+            <div class="alert alert-warning text-center">
+                ⚠️ No records found for your search.
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleSearchFields() {
+            var type = document.getElementById("searchType").value;
+            document.getElementById("bookFields").style.display = (type === "book") ? "block" : "none";
+            document.getElementById("studentFields").style.display = (type === "student") ? "block" : "none";
+        }
+
+        window.onload = function () {
+            toggleSearchFields();
+        };
+    </script>
+}

@@ -1,0 +1,233 @@
+﻿
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+
+<style>
+    .book-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .book-item {
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+        .book-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+    .book-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .book-title {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .book-meta {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .book-id {
+        font-size: 14px;
+        color: #6c757d;
+    }
+   
+
+
+
+
+    .student-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .student-item {
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+        .student-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+    .student-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+    }
+
+    .student-name {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .student-meta {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .student-id {
+        font-size: 14px;
+        color: #6c757d;
+    }
+</style>
+
+<main>
+    <section class="main-panel" id="main-panel">
+        <!-- 🔹 First Row: Totals (3 items) -->
+        <div class="row">
+            <div class="card">
+                <h3>Total Books</h3>
+                <p id="total-books">0</p>
+            </div>
+            <div class="card">
+                <h3>Total Students</h3>
+                <p id="total-students">0</p>
+            </div>
+            <div class="card">
+                <h3>Pending Requests</h3>
+                <p id="total-pending">0</p>
+            </div>
+
+        </div>
+
+        <!-- 🔹 Second Row: Recent Info (2 items) -->
+        <div class="row">
+            <div class="card shadow-sm border-0" style="flex: 1; border-radius: 8px;">
+                <div class="card-body">
+                    <h3 class="card-title mb-3">Recently Added Books</h3>
+                    <div id="recent-books" class="book-list">
+                        <div class="text-muted">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <div class="card shadow-sm border-0" style="flex: 1; border-radius: 8px;">
+                <div class="card-body">
+                    <h3 class="card-title mb-3">Recently Added Students</h3>
+                    <div id="recent-students" class="student-list">
+                        <div class="text-muted">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+</section>
+</main>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('@Url.Action("GetCounts", "Default")')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("total-books").innerText = data.TotalBooks;
+                document.getElementById("total-students").innerText = data.TotalStudents;
+                document.getElementById("total-issued").innerText = data.TotalIssued;
+            })
+            .catch(error => console.error("Error fetching counts:", error));
+    });
+
+
+     fetch('@Url.Action("GetRecentBooks", "Default")')
+    .then(response => response.json())
+    .then(data => {
+        const container = document.getElementById("recent-books");
+
+        if (data.length === 0) {
+            container.innerHTML = `<div class="text-muted">No books available.</div>`;
+        } else {
+            let html = "";
+            data.forEach(book => {
+                html += `
+                    <div class="book-item">
+    <div class="book-header">
+        <div>
+            <div class="book-title">${book.Title}</div>
+            <div class="book-meta">Author: ${book.Author} • Qty: ${book.Quantity}</div>
+        </div>
+        <div class="book-id">ID: ${book.BookId}</div>
+    </div>
+</div>
+
+                `;
+            });
+            container.innerHTML = html;
+        }
+    })
+    .catch(error => {
+        console.error("Error fetching recent books:", error);
+        document.getElementById("recent-books").innerHTML = `<div class="text-danger">Failed to load books.</div>`;
+    });
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch('/Default/GetPendingRequestCount')
+            .then(res => res.json())
+            .then(count => {
+                document.getElementById('total-pending').textContent = count;
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('total-pending').textContent = 'Error';
+            });
+    });
+
+     document.addEventListener('DOMContentLoaded', () => {
+        fetch('@Url.Action("GetRecentStudents", "Default")')
+        .then(response => response.json())
+        .then(data => {
+        const container = document.getElementById('recent-students');
+        if (data.length === 0) {
+        container.innerHTML = "<div class='text-muted'>No students found.</div>";
+        return;
+        }
+
+        let html = "";
+        data.forEach(student => {
+        html += `
+        <div class="student-item">
+            <div class="student-header">
+                <div>
+                    <div class="student-name">${student.FullName}</div>
+                    <div class="student-meta">${student.Email} • ${student.Phone}</div>
+                </div>
+                <div class="student-id">ID: ${student.StudentId}</div>
+            </div>
+        </div>
+        `;
+        });
+
+        container.innerHTML = html;
+        })
+        .catch(error => {
+        document.getElementById('recent-students').innerHTML = "<div class='text-danger'>Error loading students</div>";
+        console.error("Error fetching students:", error);
+        });
+        });
+</script>
+
+
+

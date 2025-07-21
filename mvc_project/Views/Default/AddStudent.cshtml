@@ -1,0 +1,128 @@
+﻿@{
+    ViewBag.Title = "Add Student";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f4f8;
+        margin: 0;
+        padding: 0px;
+    }
+
+    .form-container {
+        max-width: 500px;
+        margin: 40px auto;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #2563eb;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 18px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background-color: #2563eb;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        width: 100%;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background-color: #1e4fc6;
+        }
+
+    .success {
+        margin-top: 15px;
+        text-align: center;
+        color: green;
+        font-weight: bold;
+    }
+    .custom-select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 18px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 14px;
+        background-color: #fff;
+        appearance: none; /* for Chrome */
+        -webkit-appearance: none; /* for Safari */
+        -moz-appearance: none; /* for Firefox */
+        background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px 16px;
+    }
+
+</style>
+
+<div class="form-container">
+    <h2>👨‍🎓 Add Student</h2>
+
+    <form method="post" action="/Default/AddStudent">
+        <label>Student ID:</label>
+        <input type="text" class="form-control" id="StudentId" name="StudentId" value="@ViewBag.NewStudentId" readonly />
+
+        <label>Full Name:</label>
+        <input type="text" name="FullName" required />
+
+        <label>Email:</label>
+        <input type="email" name="Email" required />
+
+        <label>Phone:</label>
+        <input type="tel" name="Phone" required />
+
+        <label for="Department">Department:</label>
+        <select name="Department" id="Department" class="custom-select" required>
+            <option value="">-- Select Department --</option>
+            <option value="BCA">BCA</option> 
+            <option value="BCS">BCS</option> 
+            <option value="BBA">BBA</option> 
+            <option value="bcom">B.COM</option>
+            <option value="BA">BA</option>
+            <option value="Computer">Computer</option>
+            <option value="Mechanical">Mechanical</option>
+            <option value="Civil">Civil</option>
+            <option value="Electrical">Electrical</option>
+        </select>
+
+
+        <button type="submit">Add Student</button>
+    </form>
+
+    @if (ViewBag.Message != null)
+    {
+        <div class="success">@ViewBag.Message</div>
+    }
+</div>

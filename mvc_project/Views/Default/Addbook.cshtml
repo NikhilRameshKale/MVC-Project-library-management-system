@@ -1,0 +1,103 @@
+﻿
+@{
+    ViewBag.Title = "Addbook";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f4f8;
+        margin: 0;
+        padding: 0px;
+    }
+
+    .form-container {
+        max-width: 500px;
+        margin: 40px auto;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #2563eb;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 18px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background-color: #2563eb;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        width: 100%;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background-color: #1e4fc6;
+        }
+
+    .success {
+        margin-top: 15px;
+        text-align: center;
+        color: green;
+        font-weight: bold;
+    }
+</style>
+
+
+    <div class="form-container">
+        <h2>📘Added Books</h2>
+
+        <form method="post" action="/Default/SaveBook">
+            <label>Book ID:</label>
+            <input type="text" id="BookId" name="BookId" value="@ViewBag.NewBookId" readonly />
+
+
+            <label>Title:</label>
+            <input type="text" name="Title" required />
+
+            <label>Author:</label>
+            <input type="text" name="Author" required />
+
+            <label>Publisher:</label>
+            <input type="text" name="Publisher" required />
+
+            <label>ISBN:</label>
+            <input type="text" name="ISBN" required />
+
+            <label>Quantity:</label>
+            <input type="number" name="Quantity" min="1" required />
+
+            <button type="submit">Add Book</button>
+        </form>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="success">@ViewBag.Message</div>
+        }
+    </div>

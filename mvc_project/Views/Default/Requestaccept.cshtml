@@ -1,0 +1,216 @@
+﻿@{
+    ViewBag.Title = "Requestaccept";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    .status-update-form {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: 50px auto;
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .status-update-form h3 {
+        text-align: center;
+        color: #2c3e50;
+        font-size: 24px;
+        margin-bottom: 25px;
+    }
+
+    .status-update-form label {
+        display: block;
+        margin-top: 15px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .status-update-form input[type="number"],
+    .status-update-form select {
+        width: 473px;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+        margin-top: 6px;
+        transition: border-color 0.3s;
+    }
+        .status-update-form input[type="text"],
+        .status-update-form select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            margin-top: 6px;
+            transition: border-color 0.3s;
+        }
+
+    .status-update-form input[type="number"]:focus,
+    .status-update-form select:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    .status-update-form button {
+        margin-top: 25px;
+        width: 100%;
+        padding: 12px;
+        background-color: #28a745;
+        border: none;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .status-update-form button:hover {
+        background-color: #218838;
+    }
+
+    .status-success {
+        margin-top: 20px;
+        padding: 12px;
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    #request-details {
+        margin-top: 25px;
+        padding: 18px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        display: none;
+    }
+
+    #request-details p {
+        margin: 8px 0;
+        font-size: 15px;
+        color: #333;
+    }
+
+    #request-details span {
+        font-weight: 500;
+        color: #007bff;
+    }
+
+    .error-message {
+        color: red;
+        margin-top: 12px;
+        display: none;
+        text-align: center;
+        font-weight: 600;
+    }
+
+   
+</style>
+
+<div class="status-update-form">
+    <h3>🔁 Update Book Request Status</h3>
+
+    <form method="post" action="/Default/UpdateRequestStatus">
+        <label for="RequestId">Request ID:</label>
+        <input type="number" name="RequestId" id="RequestId" required placeholder="Enter Request ID" />
+
+        <label for="EmailId">Email ID:</label>
+        <input type="text" id="EmailId" name="Email" readonly placeholder="Email will appear here" />
+
+        <div id="request-details">
+            <p><strong>Book Title:</strong> <span id="bookTitle"></span></p>
+            <p><strong>Author:</strong> <span id="author"></span></p>
+            <p><strong>Publisher:</strong> <span id="publisher"></span></p>
+            <p><strong>Request Date & Time:</strong> <span id="requestDateTime"></span></p>
+            <p><strong>Request Status:</strong> <span id="requestStatus"></span></p>
+        </div>
+
+        <div class="error-message" id="error-message">❌ Request ID not found.</div>
+
+        <label for="RequestAccept">Select Status:</label>
+        <select name="RequestAccept" required>
+            <option value="">--Select Status--</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+
+        <button type="submit">✅ Update Status</button>
+    </form>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="status-success">@TempData["Message"]</div>
+    }
+</div>
+
+<script>
+    document.getElementById("RequestId").addEventListener("change", function () {
+        const requestId = this.value;
+        const detailsDiv = document.getElementById("request-details");
+        const errorDiv = document.getElementById("error-message");
+
+        if (requestId.trim() === "") return;
+
+        fetch(`/Default/GetRequestDetails?id=${requestId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.bookTitle) {
+                    document.getElementById("bookTitle").textContent = data.bookTitle;
+                    document.getElementById("author").textContent = data.author;
+                    document.getElementById("publisher").textContent = data.publisher;
+                    document.getElementById("requestDateTime").textContent = data.requestDateTime;
+                    document.getElementById("requestStatus").textContent = data.requestStatus;
+                    detailsDiv.style.display = "block";
+                    errorDiv.style.display = "none";
+                } else {
+                    detailsDiv.style.display = "none";
+                    errorDiv.style.display = "block";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                detailsDiv.style.display = "none";
+                errorDiv.style.display = "block";
+            });
+    });
+
+
+</script>
+
+<script>
+    document.getElementById('RequestId').addEventListener('change', function () {
+        const id = this.value;
+        const emailBox = document.getElementById('EmailId');
+
+        if (!id) {
+            emailBox.value = "";
+            return;
+        }
+
+        fetch(`/Default/GetRequestEmail?id=${id}`)
+            .then(res => res.json())
+            .then(data => {
+                emailBox.value = data.email || "";
+            })
+            .catch(err => {
+                console.error("Error fetching email:", err);
+                emailBox.value = "";
+            });
+    });
+</script>

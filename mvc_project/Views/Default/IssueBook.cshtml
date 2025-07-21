@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "IssueBook";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f7fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-container {
+        max-width: 500px;
+        margin: 40px auto;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        color: #444;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+    .details-box {
+        background-color: #f0f0f0;
+        padding: 10px;
+        margin-top: -10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        display: none;
+        font-size: 14px;
+        color: #555;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+</style>
+
+<div class="form-container">
+    <h2>📖 Issue Book</h2>
+    <form method="post" action="/Default/IssueBookw">
+        <label for="issue-student-id">Student ID</label>
+        <input type="text" id="issue-student-id" name="StudentId" required />
+        <div id="student-details" class="details-box"></div>
+
+        <label for="issue-book-id">Book ID</label>
+        <input type="text" id="issue-book-id" name="BookId" required />
+        <div id="book-details" class="details-box"></div>
+
+        <label for="issue-date">Issue Date</label>
+        <input type="date" id="issue-date" name="IssueDate" required />
+
+        <label for="return-date">Due Date</label>
+        <input type="date" id="return-date" name="DueDate" required />
+
+        <button type="submit">Issue Book</button>
+    </form>
+
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-success" style="margin-top: 20px; color: green;">@ViewBag.Message</div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const studentInput = document.getElementById('issue-student-id');
+            const studentBox = document.getElementById('student-details');
+            studentInput.addEventListener('change', () => {
+                const id = studentInput.value.trim();
+                studentBox.style.display = 'block';
+                studentBox.textContent = 'Loading...';
+                fetch(`@Url.Action("GetStudentDetails", "Default")?id=${encodeURIComponent(id)}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        studentBox.innerHTML = d.fullName
+                            ? `<strong>${d.fullName}</strong><br/>${d.email}`
+                            : 'No student found';
+                    })
+                    .catch(() => studentBox.textContent = 'Error loading student');
+            });
+
+            const bookInput = document.getElementById('issue-book-id');
+            const bookBox = document.getElementById('book-details');
+            bookInput.addEventListener('change', () => {
+                const id = bookInput.value.trim();
+                bookBox.style.display = 'block';
+                bookBox.textContent = 'Loading...';
+                fetch(`@Url.Action("GetBookDetails", "Default")?id=${encodeURIComponent(id)}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        bookBox.innerHTML = d.title
+                            ? `<strong>${d.title}</strong><br>by ${d.author}`
+                            : 'No book found';
+                    })
+                    .catch(() => bookBox.textContent = 'Error loading book');
+            });
+        });
+    </script>
+}
